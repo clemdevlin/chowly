@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRef } from "react";
+import { Camera, GeoJSONSource, Layer, Map, Marker } from "@maplibre/maplibre-react-native";
 import { Text, View } from "react-native";
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import { useCSSVariable } from "uniwind";
 
 import type { Order, OrderPoint } from "@/lib/api";
@@ -9,26 +8,9 @@ import type { Order, OrderPoint } from "@/lib/api";
 /** Keeps the pins clear of the map edges once the route is framed. */
 const EDGE_PADDING = { bottom: 90, left: 70, right: 70, top: 70 };
 
-/** Street-level view for an order with only one known point. */
-const SINGLE_POINT_DELTA = 0.006;
+const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
-const region = (points: OrderPoint[]) => {
-  const lats = points.map((point) => point.lat);
-  const lngs = points.map((point) => point.lng);
-
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-
-  // A small margin only; fitToCoordinates tightens this once the map is ready.
-  return {
-    latitude: (minLat + maxLat) / 2,
-    latitudeDelta: Math.max((maxLat - minLat) * 1.4, SINGLE_POINT_DELTA),
-    longitude: (minLng + maxLng) / 2,
-    longitudeDelta: Math.max((maxLng - minLng) * 1.4, SINGLE_POINT_DELTA),
-  };
-};
+const position = (point: OrderPoint): [number, number] => [point.lng, point.lat];
 
 const Pin = ({ color, icon }: { color: string; icon: keyof typeof Ionicons.glyphMap }) => (
   <View
@@ -45,7 +27,6 @@ const Pin = ({ color, icon }: { color: string; icon: keyof typeof Ionicons.glyph
  * missing, so the map degrades to a message rather than a fictional route.
  */
 export function OrderRouteMap({ order }: { order: Order }) {
-  const mapRef = useRef<MapView>(null);
   const [primary, subtle] = useCSSVariable(["--color-primary", "--color-subtle-foreground"]);
 
   const pickup = order.restaurantLocation;
@@ -68,31 +49,39 @@ export function OrderRouteMap({ order }: { order: Order }) {
     );
   }
 
-  const coordinates = points.map((point) => ({ latitude: point.lat, longitude: point.lng }));
+  const coordinates = points.map(position);
+  const longitudes = points.map((point) => point.lng);
+  const latitudes = points.map((point) => point.lat);
+  const west = Math.min(...longitudes);
+  const east = Math.max(...longitudes);
+  const south = Math.min(...latitudes);
+  const north = Math.max(...latitudes);
 
   return (
-    <MapView
-      initialRegion={region(points)}
-      // Frame the pins as tightly as the viewport allows, so a short hop across
-      // one neighbourhood fills the map instead of sitting in a wide city view.
-      onMapReady={() =>
-        coordinates.length > 1 &&
-        mapRef.current?.fitToCoordinates(coordinates, {
-          animated: false,
-          edgePadding: EDGE_PADDING,
-        })
-      }
-      pitchEnabled={false}
-      provider={PROVIDER_GOOGLE}
-      ref={mapRef}
-      rotateEnabled={false}
-      style={{ flex: 1 }}
-      toolbarEnabled={false}
-    >
+    <Map mapStyle={MAP_STYLE} style={{ flex: 1 }} touchPitch={false} touchRotate={false}>
+      <Camera
+        initialViewState={
+          west === east && south === north
+            ? { center: coordinates[0], zoom: 15 }
+            : { bounds: [west, south, east, north], padding: EDGE_PADDING }
+        }
+      />
+
+      {coordinates.length > 1 ? (
+        <GeoJSONSource id="order-points" data={{ type: "LineString", coordinates }}>
+          <Layer
+            id="order-line"
+            type="line"
+            paint={{ "line-color": primary as string, "line-width": 4 }}
+          />
+        </GeoJSONSource>
+      ) : null}
+
       {pickup ? (
         <Marker
-          coordinate={{ latitude: pickup.lat, longitude: pickup.lng }}
-          title={order.restaurantName}
+          id="pickup"
+          lngLat={position(pickup)}
+          accessibilityLabel={order.restaurantName}
         >
           <Pin color="#102a2a" icon="restaurant" />
         </Marker>
@@ -100,8 +89,9 @@ export function OrderRouteMap({ order }: { order: Order }) {
 
       {courier ? (
         <Marker
-          coordinate={{ latitude: courier.lat, longitude: courier.lng }}
-          title={order.driver?.name ?? "Courier"}
+          id="courier"
+          lngLat={position(courier)}
+          accessibilityLabel={order.driver?.name ?? "Courier"}
         >
           <Pin color={primary as string} icon="bicycle" />
         </Marker>
@@ -116,10 +106,6 @@ export function OrderRouteMap({ order }: { order: Order }) {
         </Marker>
       ) : null}
 
-      {/* A straight leg, not a driven route: no routing service is wired up yet. */}
-      {coordinates.length > 1 ? (
-        <Polyline coordinates={coordinates} strokeColor={primary as string} strokeWidth={4} />
-      ) : null}
-    </MapView>
+    </Map>
   );
 }

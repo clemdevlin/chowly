@@ -7,7 +7,8 @@ import { clearAccessToken, getAccessToken } from "@/features/auth/token-storage"
  * `adb reverse tcp:8000 tcp:8000` so localhost reaches the API on your machine;
  * on a physical device use your machine's LAN IP.
  */
-const baseURL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+// const baseURL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.155.108.233:8000/api/v1";
+const baseURL = "http://overimaginative-chevroned-braelynn.ngrok-free.dev/api/v1";
 
 /** The shape the API's error handler returns for every failure. */
 export type ApiErrorBody = {

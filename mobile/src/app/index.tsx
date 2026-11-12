@@ -9,7 +9,12 @@ import { useSession } from "@/features/auth/use-session";
  * -> location, otherwise the customer home.
  */
 export default function Index() {
-  const { isResolving, isSignedIn, landingRoute } = useSession();
+  const { isResolving, isSignedIn, landingRoute, user } = useSession();
+
+  console.log("Index - isResolving:", isResolving);
+  console.log("Index - isSignedIn:", isSignedIn);
+  console.log("Index - landingRoute:", landingRoute);
+  console.log("Index - user:", user);
 
   if (isResolving) return <SessionLoading />;
   if (!isSignedIn) return <Redirect href="/welcome" />;

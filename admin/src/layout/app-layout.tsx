@@ -90,7 +90,7 @@ export function AppLayout() {
         </header>
 
         <main className="flex-1 p-6">
-          <div className="mx-auto w-full max-w-[1400px]">
+          <div className="mx-auto w-full max-w-350">
             <Outlet />
           </div>
         </main>

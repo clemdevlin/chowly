@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
 
@@ -149,12 +149,18 @@ export default function OrderTrackingScreen() {
               accessibilityLabel={`Call ${driver.name}`}
               accessibilityRole="button"
               className="h-11 w-11 items-center justify-center rounded-pill border border-border active:bg-muted"
-              onPress={() =>
-                toast(
-                  driver.phone ? `Calling ${driver.name}` : "No number for this courier yet",
-                  { description: driver.phone ?? "Rider phone numbers arrive with the driver app." },
-                )
-              }
+              onPress={() => {
+                if (driver.phone) {
+                  toast(`Calling ${driver.name}`, {
+                    description: driver.phone ?? "Rider phone numbers arrive with the driver app.",
+                  });
+                  void Linking.openURL(`tel:${driver.phone}`);
+                } else {
+                  toast("No number for this courier yet", {
+                    description: "Rider phone numbers arrive with the driver app.",
+                  });
+                }
+              }}
             >
               <Ionicons color={subtle as string} name="call-outline" size={18} />
             </Pressable>
