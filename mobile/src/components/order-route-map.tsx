@@ -99,8 +99,9 @@ export function OrderRouteMap({ order }: { order: Order }) {
 
       {dropoff ? (
         <Marker
-          coordinate={{ latitude: dropoff.lat, longitude: dropoff.lng }}
-          title="Your address"
+          id="dropoff"
+          lngLat={position(dropoff)}
+          accessibilityLabel="Your address"
         >
           <Pin color={primary as string} icon="home" />
         </Marker>

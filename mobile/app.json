@@ -2,7 +2,7 @@
   "expo": {
     "name": "Chowly",
     "slug": "chowly",
-    "owner": "techwithemma",
+    "owner": "clement442",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -24,7 +24,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.chowly.app"
+      "package": "com.chowly.app",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -60,6 +64,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "10e91f33-b51e-4628-8104-de9d8f5b5a3d"
+      }
     }
   }
 }
