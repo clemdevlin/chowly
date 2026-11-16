@@ -1,4 +1,5 @@
 import path from "node:path";
+import { existsSync } from "node:fs";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -18,6 +19,7 @@ import { logger } from "./utils/logger";
 
 const app = express();
 const isProduction = Env.NODE_ENV === "production";
+const adminDistPath = path.resolve(__dirname, "../../admin/dist");
 
 app.disable("x-powered-by");
 // Render terminates TLS in front of the app; without this Express sees the
@@ -63,9 +65,8 @@ app.get("/health", (_request, response) => response.status(HTTPSTATUS.OK).json({
 
 app.use("/api/v1", apiLimiter, routes);
 
-if (isProduction) {
+if (isProduction && existsSync(adminDistPath)) {
   // The bundle runs from api/dist, so the admin build sits two levels up.
-  const adminDistPath = path.resolve(__dirname, "../../admin/dist");
 
   app.use(
     express.static(adminDistPath, {
