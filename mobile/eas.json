@@ -17,7 +17,7 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://chowly-api.vercel.app/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://apichowly.vercel.app/api/v1"
       }
     },
     "production": {

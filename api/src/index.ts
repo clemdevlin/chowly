@@ -19,7 +19,7 @@ import { logger } from "./utils/logger";
 
 const app = express();
 const isProduction = Env.NODE_ENV === "production";
-const adminDistPath = path.resolve(__dirname, "../../admin/dist");
+const adminDistPath = path.resolve(__dirname, "../public/admin/dist");
 
 app.disable("x-powered-by");
 // Render terminates TLS in front of the app; without this Express sees the
