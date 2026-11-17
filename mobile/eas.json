@@ -15,19 +15,15 @@
       },
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://chowly-api.vercel.app/api/v1"
       }
     },
     "production": {
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
-      }
-    },
-    "expo": {
-      "prebuild": {
-        "env": {
-          "EXPO_PUBLIC_API_URL": "https://chowly-api.vercel.app/api/v1"
-        }
       }
     }
   },

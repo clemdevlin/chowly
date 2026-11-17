@@ -15,7 +15,7 @@ const baseCookieOptions: CookieOptions = {
   path: "/",
   // The API serves the admin build in production, so the cookie is same-origin
   // and does not need the third-party "none" mode browsers are phasing out.
-  sameSite: "lax",
+  sameSite: "none",
   secure: isProduction,
 };
 
